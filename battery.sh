@@ -20,7 +20,7 @@ pidfile=$configfolder/battery.pid
 logfile=$configfolder/battery.log
 maintain_percentage_tracker_file=$configfolder/maintain.percentage
 maintain_voltage_tracker_file=$configfolder/maintain.voltage
-daemon_path=$HOME/Library/LaunchAgents/battery.plist
+daemon_path=$HOME/Library/LaunchAgents/com.battery.app.plist
 calibrate_pidfile=$configfolder/calibrate.pid
 
 # Voltage limits
@@ -698,7 +698,11 @@ if [[ "$action" == "maintain" ]]; then
 		log "Starting battery maintenance at ${setting}V ±${subsetting}V"
 		nohup $battery_binary maintain_voltage_synchronous $setting $subsetting >>$logfile &
 	else
-		log "Starting battery maintenance at $setting% $subsetting"
+		if ! [[ "$setting" == "recover" ]]; then
+			log "Starting battery maintenance at $setting% $subsetting"
+		else
+			log "Battery recover"
+		fi
 		nohup $battery_binary maintain_synchronous $setting $subsetting >>$logfile &
 	fi
 
@@ -831,7 +835,7 @@ if [[ "$action" == "create_daemon" ]]; then
 		<key>ProgramArguments</key>
 		<array>
 			<string>$binfolder/battery</string>
-			<string>$call_action</string>
+			<string>maintain</string>
 			<string>recover</string>
 		</array>
 		<key>StandardOutPath</key>
