@@ -42,7 +42,7 @@ The CLI is used for managing the battery charging status for Apple Silicon Macbo
 One-line installation:
 
 ```bash
-curl -s https://raw.githubusercontent.com/actuallymentor/battery/main/setup.sh | bash
+curl -s https://raw.githubusercontent.com/halocloud/battery/main/setup.sh | bash
 ```
 
 This will:
