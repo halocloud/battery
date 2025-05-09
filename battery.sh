@@ -201,7 +201,7 @@ function disable_discharging() {
 		# use direct commands since enable_charging also calls disable_discharging, and causes an eternal loop
 		sudo smc -k CH0B -w 00
 		sudo smc -k CH0C -w 00
-		change_magsafe_led_color "orange"
+		change_magsafe_led_color "reset"
 
 	elif [[ "$battery_percentage" -ge "$setting" && "$is_charging" == "enabled" ]]; then
 
@@ -215,7 +215,7 @@ function disable_discharging() {
 		# use direct commands since enable_charging also calls disable_discharging, and causes an eternal loop
 		sudo smc -k CH0B -w 00
 		sudo smc -k CH0C -w 00
-		change_magsafe_led_color "orange"
+		change_magsafe_led_color "reset"
 
 	fi
 
