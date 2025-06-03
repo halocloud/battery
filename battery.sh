@@ -271,7 +271,8 @@ function get_remaining_time() {
 }
 
 function get_charger_state() {
-	ac_attached=$(pmset -g batt | tail -n1 | awk '{ x=match($0, /AC attached/) > 0; print x }')
+	# ac_attached=$(pmset -g batt | tail -n1 | awk '{ x=match($0, /AC attached/) > 0; print x }')
+ 	ac_attached=$(pmset -g batt | awk '/AC Power|AC attached/{print 1; exit} {print 0; exit}')
 	echo "$ac_attached"
 }
 
