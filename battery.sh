@@ -660,6 +660,12 @@ if [[ "$action" == "maintain" ]]; then
 		exit 0
 	fi
 
+ 	if [[ "$setting" == "recover" ]]; then
+		log "Battery recover"
+		nohup $battery_binary maintain_synchronous recover >>$logfile &
+		exit 0
+	fi
+
 	# Check if setting is a voltage
 	is_voltage=false
 	if valid_voltage "$setting"; then
@@ -698,11 +704,7 @@ if [[ "$action" == "maintain" ]]; then
 		log "Starting battery maintenance at ${setting}V ±${subsetting}V"
 		nohup $battery_binary maintain_voltage_synchronous $setting $subsetting >>$logfile &
 	else
-		if ! [[ "$setting" == "recover" ]]; then
-			log "Starting battery maintenance at $setting% $subsetting"
-		else
-			log "Battery recover"
-		fi
+		log "Starting battery maintenance at $setting% $subsetting"
 		nohup $battery_binary maintain_synchronous $setting $subsetting >>$logfile &
 	fi
 
