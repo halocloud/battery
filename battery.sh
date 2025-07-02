@@ -722,6 +722,7 @@ if [[ "$action" == "maintain" ]]; then
 	# Store pid of maintenance process and setting
 	echo $! >$pidfile
 	pid=$(cat "$pidfile" 2>/dev/null)
+ 	log "Store pid $pid of maintenance process and setting to $pidfile"
 
 	if ! [[ "$setting" == "recover" ]]; then
 
