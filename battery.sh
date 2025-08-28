@@ -561,6 +561,7 @@ if [[ "$action" == "maintain_synchronous" ]]; then
 		# Keep track of status
 		is_charging=$(get_smc_charging_status)
 		ac_attached=$(get_charger_state)
+  		log "Battery charging $is_charging, ac_attached=$ac_attached"
 
 		if [[ "$battery_percentage" -ge "$setting" && ("$is_charging" == "enabled" || "$ac_attached" == "1") ]]; then
 
