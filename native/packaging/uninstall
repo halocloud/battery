@@ -1,0 +1,22 @@
+#!/bin/bash
+set -euo pipefail
+root=/Library/PrivilegedHelperTools/local.batterycore
+source "$root/common.sh"
+[[ "$EUID" == 0 ]] || fail "Run batteryctl uninstall to request administrator authorization."
+assert_secure_path "$root"
+assert_secure_path "$root/batteryctl"
+state='/Library/Application Support/BatteryCore'
+assert_secure_path "$state"
+plist=/Library/LaunchDaemons/local.batterycore.daemon.plist
+assert_secure_path "$plist"
+"$root/batteryctl" --prepare-uninstall || fail "Could not verify control release. Nothing was removed. Restore service/hardware access and retry."
+/bin/launchctl disable system/local.batterycore.daemon
+/bin/launchctl bootout system/local.batterycore.daemon
+link=/usr/local/bin/batteryctl
+if [[ -L "$link" && "$(/usr/bin/readlink "$link")" == "$root/batteryctl" ]]; then /bin/rm "$link"; fi
+/bin/rm "$plist"
+/bin/rm -rf "$state" "$root"
+if /usr/sbin/pkgutil --pkg-info local.batterycore >/dev/null 2>&1; then
+    /usr/sbin/pkgutil --forget local.batterycore
+fi
+printf '%s\n' 'BatteryCore removed after verifying release of its charging control.'

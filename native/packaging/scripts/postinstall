@@ -1,0 +1,25 @@
+#!/bin/bash
+set -euo pipefail
+source "$(/usr/bin/dirname "$0")/common.sh"
+[[ "$EUID" == 0 && "${3:-/}" == / ]] || fail "Administrator installation on the running volume is required."
+root=/Library/PrivilegedHelperTools/local.batterycore
+state='/Library/Application Support/BatteryCore'
+assert_secure_path "$root"
+/bin/mkdir -p "$state"
+assert_secure_path "$state"
+/usr/sbin/chown root:wheel "$state"
+/bin/chmod 700 "$state"
+profile="$state/verified-hardware.json"
+if [[ -e "$profile" || -L "$profile" ]]; then assert_secure_path "$profile"
+else /usr/bin/install -o root -g wheel -m 600 "$root/verified-hardware.json" "$profile"; fi
+for file in batteryctl batteryd smc uninstall common.sh manifest.json; do assert_secure_path "$root/$file"; done
+/bin/mkdir -p /usr/local/bin
+link=/usr/local/bin/batteryctl
+if [[ -e "$link" || -L "$link" ]]; then
+    [[ -L "$link" && "$(/usr/bin/readlink "$link")" == "$root/batteryctl" ]] || fail "An unrelated batteryctl already exists."
+else /bin/ln -s "$root/batteryctl" "$link"; fi
+plist=/Library/LaunchDaemons/local.batterycore.daemon.plist
+assert_secure_path "$plist"
+/bin/launchctl enable system/local.batterycore.daemon
+/bin/launchctl bootstrap system "$plist"
+printf '%s\n' 'BatteryCore installed disabled. Run batteryctl diagnose. Hardware writes require an exact validated profile.'

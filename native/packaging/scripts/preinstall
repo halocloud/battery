@@ -1,0 +1,28 @@
+#!/bin/bash
+set -euo pipefail
+source "$(/usr/bin/dirname "$0")/common.sh"
+[[ "$EUID" == 0 ]] || fail "Administrator installation is required."
+[[ "${3:-/}" == / ]] || fail "Install on the running system volume only."
+[[ "$(/usr/bin/uname -m)" == arm64 ]] || fail "Apple Silicon is required."
+os_version=$(/usr/bin/sw_vers -productVersion)
+[[ "${os_version%%.*}" -ge 15 ]] || fail "macOS 15 or later is required."
+check_legacy
+root=/Library/PrivilegedHelperTools/local.batterycore
+for parent in /Library /Library/PrivilegedHelperTools /Library/LaunchDaemons; do
+    if [[ -e "$parent" || -L "$parent" ]]; then assert_secure_path "$parent"; fi
+done
+if [[ -e "$root" || -L "$root" ]]; then assert_secure_path "$root"; fi
+plist=/Library/LaunchDaemons/local.batterycore.daemon.plist
+if [[ -e "$plist" || -L "$plist" ]]; then assert_secure_path "$plist"; fi
+state='/Library/Application Support/BatteryCore'
+if [[ -e "$state" || -L "$state" ]]; then assert_secure_path "$state"; fi
+link=/usr/local/bin/batteryctl
+if [[ -e "$link" || -L "$link" ]]; then
+    [[ -L "$link" && "$(/usr/bin/readlink "$link")" == "$root/batteryctl" ]] || fail "An unrelated batteryctl already exists."
+fi
+if [[ "${1:-}" == --check-only ]]; then exit 0; fi
+if /bin/launchctl print system/local.batterycore.daemon >/dev/null 2>&1; then
+    assert_secure_path "$root/batteryctl"
+    "$root/batteryctl" --prepare-upgrade || fail "Could not release old service control. Upgrade aborted."
+    /bin/launchctl bootout system/local.batterycore.daemon
+fi

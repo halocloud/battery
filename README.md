@@ -1,5 +1,9 @@
 # Battery charge limiter for Apple Silicon Macbook devices
 
+> **New native CLI:** see [BatteryCore](native/README.md) for the Swift command-line tool,
+> remote command installation, and migration instructions. Its remote release must be published
+> before the installation URL is usable. The instructions below describe the legacy Bash/Electron tool.
+
 <img width="300px" align="right" src="./screenshots/tray.png"/>This tool makes it possible to keep a chronically plugged in Apple Silicon Macbook at `80%` battery, since that will prolong the longevity of the battery. It is free and open-source and will remain that way.
 
 > Want to know if this tool does anything or is just a placebo? Read [this excellent article](https://batteryuniversity.com/article/bu-808-how-to-prolong-lithium-based-batteries). TL;DR: keep your battery cool, keep it at 80% when plugged in, and discharge it as shallowly as feasible.
